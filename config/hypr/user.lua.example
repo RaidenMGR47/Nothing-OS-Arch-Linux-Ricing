@@ -1,0 +1,37 @@
+-- user.lua — Glyph overrides. Loaded last from hyprland.lua, and gitignored, so `git pull`
+-- never touches it. install.sh creates it from this example and manages only the blocks marked
+-- with ">>> glyph:" / "<<< glyph:". Put your own settings outside those blocks.
+
+-- Alternative binds for layouts where the backslash key needs AltGr (Spanish/Latin American,
+-- German, French...). The originals stay in hyprland/keybinds.lua.
+local fn = require("hyprland.functions")
+
+-- center the active window
+hl.bind("SUPER + ALT + C", hl.dsp.window.center())
+
+-- resize to 55% x 70% of the screen
+hl.bind("SUPER + ALT + X", hl.dsp.window.resize(fn.resize_by_screen(55, 70)))
+
+-- picture-in-picture: float, pin and move the active window to the corner
+hl.bind("SUPER + ALT + P", function()
+    local a = hl.get_active_window()
+    if not a then return end
+    local pip = fn.move_actions(a) or {}
+    if not a.floating then table.insert(pip, 1, hl.dsp.window.float()) end
+    table.insert(pip, hl.dsp.window.pin({ action = "on", window = "address:" .. a.address }))
+    for _, action in ipairs(pip) do hl.dispatch(action) end
+end)
+
+-- Examples. Uncomment what you need.
+--
+-- Weather location (otherwise looked up by IP):
+-- hl.env("DEMONSHOT_LATLON", "19.43,-99.13")
+--
+-- Apps for the special workspaces, read when you press the key:
+-- local apps = require("variables").apps
+-- apps.editor = "codium"           -- Super+Shift+K
+-- apps.todo   = "planify"          -- Super+R
+-- apps.music  = "spotify-launcher" -- Super+M
+--
+-- A fixed monitor rule (install.sh writes these for you with --monitor):
+-- hl.monitor({ output = "DVI-I-1", mode = "1366x768@60", position = "auto", scale = "auto" })
