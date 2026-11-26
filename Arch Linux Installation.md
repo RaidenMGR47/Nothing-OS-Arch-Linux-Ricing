@@ -799,7 +799,7 @@ chmod +x install.sh uninstall.sh
 ./install.sh
 ```
 
-> **📌 Si ya tienes la carpeta `raidenmgr47-rice-main` descargada** (por ejemplo, la que viene con este repo), puedes copiarla como `~/.local/share/raidenmgr47` y ejecutar su `install.sh`; el resultado es el mismo. `git clone` solo añade la posibilidad de actualizar luego con `git pull`.
+> **📌 Si descargaste el ZIP desde GitHub**, la carpeta se llama `Nothing-OS-Arch-Linux-Ricing-main` (y si la descomprimiste dos veces, verás una carpeta anidada con el mismo nombre). El nombre **no importa**: entra en la carpeta que contiene `install.sh` y copia su contenido como `~/.local/share/raidenmgr47`. Con `git clone`, además, obtienes el historial para actualizar con `git pull`.
 
 Sin argumentos te pregunta qué extras quieres: `telegram` (`Super+D`), `spotify` con Spicetify (`Super+M`) y `clash` para el panel VPN (`Super+P`). También puedes elegirlos de antemano:
 

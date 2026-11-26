@@ -63,7 +63,7 @@ git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.loc
 ~/.local/share/raidenmgr47/uninstall.sh                # remove the symlinks, restore the newest backup
 ```
 
-> If you downloaded a ZIP instead of cloning, run `chmod +x install.sh uninstall.sh` once before running them.
+> If you downloaded a ZIP instead of cloning, GitHub names the folder `Nothing-OS-Arch-Linux-Ricing-main` — the name does not matter. Copy its contents to `~/.local/share/raidenmgr47` and run `chmod +x install.sh uninstall.sh` once before running them.
 
 > 📖 **Guía completa en español:** [Arch Linux Installation.md](<Arch Linux Installation.md>) — instalación desde cero (BIOS/UEFI), chroot, GRUB, controladores de GPU, teclado y la nota del monitor BenQ.
 
