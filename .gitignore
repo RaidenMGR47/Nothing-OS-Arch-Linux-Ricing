@@ -1,7 +1,7 @@
-# личное: свои бинды hypr и фото наушников
+# personal: your own hypr binds and headphone photos
 config/hypr/user.lua
 config/quickshell/glyph/buds/*.png
-# fontconfig пишет его в config/fonts после fc-cache (install.sh): у каждого свой
+# fontconfig writes it into config/fonts after fc-cache (install.sh): unique to each user
 config/fonts/.uuid
-# Claude Code: свои настройки и скиллы. git add . их не подхватит
+# Claude Code: personal settings and skills. git add . won't pick them up
 .claude/
