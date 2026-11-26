@@ -1005,7 +1005,7 @@ sudo pacman -Rns qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin
 
 **Archivos que toca la Opción D:**
 
-- `~/.config/` — Hyprland, Quickshell, kitty, fish, starship, fastfetch, btop, cava, GTK/Qt (copias previas en `~/.dots-backup-<fecha>/`).
+- `~/.config/` — Hyprland, Quickshell, kitty, fish, starship, fastfetch, btop, cava, GTK/Qt (copias previas en `~/.dots-backup-<fecha>/`; el desinstalador restaura solo la más reciente y deja las demás intactas).
 - `~/.local/bin/rice` — lanzador del shell.
 - `~/.local/share/raidenmgr47/` — el repo clonado.
 - `~/.local/share/fonts/glyph/` — fuentes del rice.
