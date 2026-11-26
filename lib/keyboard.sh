@@ -481,14 +481,14 @@ kb_apply_system() { # no_system_keyboard
             warn "localectl set-keymap failed; writing /etc/vconsole.conf directly"
         fi
         if [ -n "$KB_OPTIONS" ]; then
-            if sudo localectl set-x11-keymap "$KB_LAYOUT" "" "" "$KB_OPTIONS"; then
+            if sudo localectl set-x11-keymap --no-convert "$KB_LAYOUT" "" "" "$KB_OPTIONS"; then
                 did_x11=1
                 ok "X11 layout: $KB_LAYOUT ($KB_OPTIONS)"
             else
                 warn "localectl set-x11-keymap failed; writing 00-keyboard.conf directly"
             fi
         else
-            if sudo localectl set-x11-keymap "$KB_LAYOUT"; then
+            if sudo localectl set-x11-keymap --no-convert "$KB_LAYOUT"; then
                 did_x11=1
                 ok "X11 layout: $KB_LAYOUT"
             else

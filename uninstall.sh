@@ -84,6 +84,10 @@ restore_backup() { # backup_dir
         read -r _ dst <<<"$l"
         rel=${dst#"$HOME"/}
         [ -e "$b/$rel" ] || [ -L "$b/$rel" ] || continue
+        if [ -L "$b/$rel" ] && is_repo_link "$b/$rel"; then
+            warn "backup entry points into this repo, skipping: $b/$rel"
+            continue
+        fi
         dst="$HOME/$rel"
         if [ -L "$dst" ]; then
             if is_repo_link "$dst"; then
@@ -188,6 +192,9 @@ preflight() {
     say "preflight"
     [ -d "$DOTS/config" ] || die "run uninstall.sh from the Glyph repo root"
     [ -f "$DOTS/lib/manifest.sh" ] || die "lib/ is missing; re-clone the repo"
+    if [ "${EUID:-$(id -u)}" = 0 ]; then
+        die "run as your user, not root: sudo asks when it needs to"
+    fi
     case $DOTS in
         /|"$HOME") die "refusing to run from $DOTS" ;;
     esac

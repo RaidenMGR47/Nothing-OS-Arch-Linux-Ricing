@@ -4,6 +4,8 @@
 
 Black, white dots, one red. A sibling of [Demon's Shot](https://github.com/Nebelung-cloud/demons-shot-rice).
 
+This is an adapted copy (fork) of [glyph-rice](https://github.com/Nebelung-cloud/glyph-rice), GPL-3.0. The upstream author's voice is kept in the sections below; the installer, uninstaller and this guide were adapted here.
+
 <br>
 
 ![Glyph desktop](screenshots/desktop.png)
@@ -68,7 +70,9 @@ git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.loc
 > 📖 **Guía completa en español:** [Arch Linux Installation.md](<Arch Linux Installation.md>) — instalación desde cero (BIOS/UEFI), chroot, GRUB, controladores de GPU, teclado y la nota del monitor BenQ.
 
 Without `--with` it asks which extras to add: `telegram` (`Super` `D`), `spotify` with Spicetify (`Super` `M`),
-`clash` for the VPN panel. Old configs go to `~/.dots-backup-<date>/`. Wallpapers are read from `~/Pictures/Wallpapers`,
+`clash` for the VPN panel. AUR packages are installed interactively (unless `--yes`) so you can review the PKGBUILDs;
+if you pick `spotify`, launch it and log in once, then run `spicetify config custom_apps marketplace && spicetify backup apply`.
+Old configs go to `~/.dots-backup-<date>/`. Wallpapers are read from `~/Pictures/Wallpapers`,
 gifs for the home cat tile from `~/Pictures/Gifs` (pick one in prefs → home, or click the tile; none there — the cat).
 Weather (home, deck, lock) comes from open-meteo; the place is looked up by your IP at ipinfo.io unless
 `DEMONSHOT_LATLON` is set, e.g. `hl.env("DEMONSHOT_LATLON", "52.52,13.40")` in `user.lua`.

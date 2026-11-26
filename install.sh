@@ -117,6 +117,9 @@ preflight() {
     say "preflight"
     [ -d "$DOTS/config" ] || die "run install.sh from the Glyph repo root"
     [ -f "$DOTS/lib/manifest.sh" ] || die "lib/ is missing; re-clone the repo"
+    if [ "${EUID:-$(id -u)}" = 0 ] && [ "$CHECK_ONLY" != 1 ]; then
+        die "run as your user, not root: sudo asks when it needs to"
+    fi
     case $DOTS in
         /|"$HOME") die "refusing to run from $DOTS" ;;
     esac
@@ -173,10 +176,20 @@ extras() {
     fi
 }
 
+aur_install() { # helper pkg... — interactive unless --yes, so PKGBUILDs can be reviewed
+    local helper=$1
+    shift
+    if [ "$YES" = 1 ]; then
+        "$helper" -S --needed --noconfirm "$@"
+    else
+        "$helper" -S --needed "$@"
+    fi
+}
+
 packages() {
     say "pacman"
     local pa p helper tmp
-    local -a avail=() missing=()
+    local -a avail=() missing=() makepkg_args=()
 
     # PulseAudio modules make pacman refuse to replace pulseaudio with pipewire-pulse.
     pa=$(pacman -Qq pulseaudio-{bluetooth,jack,lirc,rtp,zeroconf,equalizer,equalizer-ladspa} 2>/dev/null || true)
@@ -189,8 +202,12 @@ packages() {
         warn "pacman will ask to replace pulseaudio with pipewire-pulse: answer yes"
     fi
 
-    # pacman -Syu aborts the whole transaction on one unknown name. Check first, then install
-    # everything that exists so a renamed optional package does not take the session down.
+    # Upgrade the database first: with stale mirrors a package added upstream would be reported
+    # as unknown and make the whole transaction abort. Then install everything that exists, so a
+    # renamed optional package cannot take the session down.
+    if ! sudo pacman -Syu; then
+        die "pacman -Syu failed. If it is a keyring error: sudo pacman -Sy archlinux-keyring && sudo pacman -Su"
+    fi
     for p in "${PACMAN[@]}"; do
         if pacman -Si "$p" >/dev/null 2>&1 || pacman -Sgq "$p" >/dev/null 2>&1; then
             avail+=("$p")
@@ -202,7 +219,7 @@ packages() {
         warn "not in the configured repos, skipping: ${missing[*]}"
     fi
     [ ${#avail[@]} -gt 0 ] || die "none of the packages are available; check your mirrors"
-    if ! sudo pacman -Syu --needed "${avail[@]}"; then
+    if ! sudo pacman -S --needed "${avail[@]}"; then
         die "pacman failed. If it is a keyring error: sudo pacman -Sy archlinux-keyring && sudo pacman -Su"
     fi
 
@@ -220,7 +237,10 @@ packages() {
             rm -rf -- "$tmp"
             die "cannot clone yay-bin (network or AUR down?)"
         fi
-        if ! ( cd "$tmp/yay-bin" && makepkg -si --noconfirm ); then
+        if [ "$YES" = 1 ]; then
+            makepkg_args=(--noconfirm)
+        fi
+        if ! ( cd "$tmp/yay-bin" && makepkg -si "${makepkg_args[@]}" ); then
             rm -rf -- "$tmp"
             die "yay-bin failed to build"
         fi
@@ -230,12 +250,17 @@ packages() {
     fi
 
     say "AUR"
-    if ! "$helper" -S --needed --noconfirm "${AUR[@]}"; then
+    if ! aur_install "$helper" "${AUR[@]}"; then
         warn "AUR: some packages failed; the rice still works without the optional ones"
     fi
     if [ ${#EXT[@]} -gt 0 ]; then
-        if ! "$helper" -S --needed --noconfirm "${EXT[@]}"; then
+        if ! aur_install "$helper" "${EXT[@]}"; then
             warn "extras: some packages failed"
+        fi
+        if printf '%s\n' "${EXT[@]}" | grep -qx 'spicetify-cli'; then
+            say "spicetify"
+            info "launch Spotify, log in, then run:"
+            dim "spicetify config custom_apps marketplace && spicetify backup apply"
         fi
     fi
 }
@@ -286,7 +311,11 @@ links() {
         fi
         target=$(readlink -- "$dst" 2>/dev/null || true)
         [ "$target" = "$src" ] && continue
-        if [ -e "$dst" ] || [ -L "$dst" ]; then
+        if [ -L "$dst" ] && is_repo_link "$dst"; then
+            # A previous install's own symlink: drop it, never back it up, or uninstall would
+            # restore a link pointing into this repo after it is deleted.
+            rm -f -- "$dst"
+        elif [ -e "$dst" ] || [ -L "$dst" ]; then
             mkdir -p -- "$BACKUP/$(dirname -- "${dst#"$HOME"/}")"
             mv -- "$dst" "$BACKUP/${dst#"$HOME"/}"
         fi
@@ -297,7 +326,8 @@ links() {
     mkdir -p -- "$HOME/.config/demonshot" "${XDG_STATE_HOME:-$HOME/.local/state}/rice"
     printf 'glyph\n' >"${XDG_STATE_HOME:-$HOME/.local/state}/rice/shell"
     mkdir -p -- "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Gifs"
-    chmod +x -- "$DOTS/install.sh" "$DOTS/uninstall.sh" "$DOTS/config/quickshell/rice/rice" 2>/dev/null || true
+    chmod +x -- "$DOTS/install.sh" "$DOTS/uninstall.sh" "$DOTS/config/quickshell/rice/rice" \
+        "$DOTS/config/quickshell/glyph/ear" "$DOTS/config/quickshell/glyph/term/cava/dots" 2>/dev/null || true
     if have fc-cache; then
         fc-cache -f >/dev/null 2>&1 || true
     fi

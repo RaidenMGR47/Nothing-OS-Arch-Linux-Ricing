@@ -884,7 +884,7 @@ Las letras, números, flechas y teclas de función están en la misma posición 
 |Acción|Atajo original|Alternativa en latam|
 |---|---|---|
 |Centrar ventana|`Ctrl+Super+\`|**`Super+Alt+C`**|
-|Redimensionar al 55 % × 70 %|`Ctrl+Super+Alt+\`|**`Super+Alt+X`**|
+|Redimensionar al 55 % × 70 % y centrar|`Ctrl+Super+Alt+\`|**`Super+Alt+X`**|
 |Ventana flotante tipo PIP|`Super+Alt+\`|**`Super+Alt+P`**|
 
 Una instalación nueva incluye estas alternativas porque el instalador crea `user.lua` desde `user.lua.example`. Si vienes de una configuración anterior que no las tiene, añádelas así:
@@ -894,13 +894,14 @@ local fn = require("hyprland.functions")
 
 hl.bind("SUPER + ALT + C", hl.dsp.window.center())
 hl.bind("SUPER + ALT + X", hl.dsp.window.resize(fn.resize_by_screen(55, 70)))
+hl.bind("SUPER + ALT + X", hl.dsp.window.center())   -- el original también centra
 
 hl.bind("SUPER + ALT + P", function()
     local a = hl.get_active_window()
     if not a then return end
     local pip = fn.move_actions(a) or {}
     if not a.floating then table.insert(pip, 1, hl.dsp.window.float()) end
-    table.insert(pip, 1, hl.dsp.window.pin({ action = "on", window = "address:" .. a.address }))
+    table.insert(pip, hl.dsp.window.pin({ action = "on", window = "address:" .. a.address }))
     for _, action in ipairs(pip) do hl.dispatch(action) end
 end)
 ```
@@ -928,6 +929,8 @@ Atajos de referencia del rice:
 |Pantalla completa|`Super+F`|
 |Flotante|`Super+Alt+Space`|
 |Mover/redimensionar con ratón|`Super+Z` / `Super+X`|
+
+> **📌 Sobre los atajos con `=`:** además de los de barra invertida, el rice usa `Super+=`, `Super+Shift+=` y `Ctrl+Super+=` para redimensionar. En `latam` la `=` puede estar bajo Shift+0 y no disparar; compruébalo con `hyprctl binds | grep Equal` y, si falla, añade alternativas en `user.lua`.
 
 > **📌 Todos los overrides van en `~/.config/hypr/user.lua`**, no en los archivos del repo: así `git pull` actualiza el rice sin pisar tus cambios.
 
@@ -1006,6 +1009,8 @@ sudo pacman -Rns qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin
 - `~/.local/bin/rice` — lanzador del shell.
 - `~/.local/share/raidenmgr47/` — el repo clonado.
 - `~/.local/share/fonts/glyph/` — fuentes del rice.
+- `~/.config/demonshot/` y `~/.local/state/rice/` — estado del rice y del selector de fondos.
+- `gsettings` de GNOME: `color-scheme=prefer-dark` y `gtk-theme=adw-gtk3-dark` (`uninstall.sh` no los revierte).
 - `~/Pictures/Wallpapers/` — carpeta del selector de fondos (no la vacía).
 - `/etc/sddm.conf.d/zz-glyph.conf` y `/usr/share/sddm/themes/glyph` — tema de login.
 - `/etc/udev/rules.d/70-glyph-uinput.rules` — regla de `ydotool`.
