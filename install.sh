@@ -189,7 +189,11 @@ aur_install() { # helper pkg... — interactive unless --yes, so PKGBUILDs can b
 packages() {
     say "pacman"
     local pa p helper tmp
-    local -a avail=() missing=() makepkg_args=()
+    local -a avail=() missing=() makepkg_args=() pac_args=()
+
+    if [ "$YES" = 1 ]; then
+        pac_args=(--noconfirm)
+    fi
 
     # PulseAudio modules make pacman refuse to replace pulseaudio with pipewire-pulse.
     pa=$(pacman -Qq pulseaudio-{bluetooth,jack,lirc,rtp,zeroconf,equalizer,equalizer-ladspa} 2>/dev/null || true)
@@ -205,7 +209,7 @@ packages() {
     # Upgrade the database first: with stale mirrors a package added upstream would be reported
     # as unknown and make the whole transaction abort. Then install everything that exists, so a
     # renamed optional package cannot take the session down.
-    if ! sudo pacman -Syu; then
+    if ! sudo pacman -Syu "${pac_args[@]}"; then
         die "pacman -Syu failed. If it is a keyring error: sudo pacman -Sy archlinux-keyring && sudo pacman -Su"
     fi
     for p in "${PACMAN[@]}"; do
@@ -219,7 +223,7 @@ packages() {
         warn "not in the configured repos, skipping: ${missing[*]}"
     fi
     [ ${#avail[@]} -gt 0 ] || die "none of the packages are available; check your mirrors"
-    if ! sudo pacman -S --needed "${avail[@]}"; then
+    if ! sudo pacman -S --needed "${pac_args[@]}" "${avail[@]}"; then
         die "pacman failed. If it is a keyring error: sudo pacman -Sy archlinux-keyring && sudo pacman -Su"
     fi
 

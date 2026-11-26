@@ -37,9 +37,9 @@ Usage: ./uninstall.sh [options]
   -y, --yes         non-interactive; accept the defaults (restore yes, packages no)
   -h, --help        this help
 
-It removes only symlinks that point into this repo, restores the newest backup, and
-deletes the SDDM theme, zz-glyph.conf and the ydotool udev rule. SDDM itself, Hyprland,
-Quickshell and the repo stay installed. Run as your user, never with sudo.
+It removes only symlinks that point into this repo, restores the newest backup (older copies are
+left untouched), and deletes the SDDM theme, zz-glyph.conf and the ydotool udev rule. SDDM itself,
+Hyprland, Quickshell and the repo stay installed. Run as your user, never with sudo.
 EOF
 }
 
@@ -182,7 +182,7 @@ cleanup_dirs() {
             continue
         fi
         if [ "$DRY_RUN" = 1 ]; then
-            info "[dry-run] would remove the empty directory $d"
+            info "[dry-run] would remove $d if empty"
         else
             rmdir -- "$d" 2>/dev/null || true
         fi
@@ -205,9 +205,19 @@ preflight() {
 main() {
     preflight
 
+    local b
+    local -a older=()
     BACKUP=$(latest_backup || true)
     if [ -n "$BACKUP" ]; then
         info "newest backup: $BACKUP"
+        for b in "$HOME"/.dots-backup-*; do
+            [ -d "$b" ] || continue
+            [ "$b" = "$BACKUP" ] && continue
+            older+=("$(basename -- "$b")")
+        done
+        if [ ${#older[@]} -gt 0 ]; then
+            warn "older backups are left untouched (restore by hand if needed): ${older[*]}"
+        fi
     else
         warn "no ~/.dots-backup-* found; old configs cannot be restored"
     fi

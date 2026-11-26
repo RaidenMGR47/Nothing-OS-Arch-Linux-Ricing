@@ -930,7 +930,7 @@ Atajos de referencia del rice:
 |Flotante|`Super+Alt+Space`|
 |Mover/redimensionar con ratón|`Super+Z` / `Super+X`|
 
-> **📌 Sobre los atajos con `=`:** además de los de barra invertida, el rice usa `Super+=`, `Super+Shift+=` y `Ctrl+Super+=` para redimensionar. En `latam` la `=` puede estar bajo Shift+0 y no disparar; compruébalo con `hyprctl binds | grep Equal` y, si falla, añade alternativas en `user.lua`.
+> **📌 Sobre los atajos con `=`:** además de los de barra invertida, el rice usa `Super+=`, `Super+Shift+=` y `Ctrl+Super+=` para redimensionar. En `latam` la `=` puede estar bajo Shift+0 y no disparar. `hyprctl binds | grep Equal` solo confirma que el bind existe, no que la tecla llegue: pruébalos pulsándolos o usa `wev` para ver el keysym; si fallan, añade alternativas en `user.lua`.
 
 > **📌 Todos los overrides van en `~/.config/hypr/user.lua`**, no en los archivos del repo: así `git pull` actualiza el rice sin pisar tus cambios.
 
@@ -1010,8 +1010,10 @@ sudo pacman -Rns qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin
 - `~/.local/share/raidenmgr47/` — el repo clonado.
 - `~/.local/share/fonts/glyph/` — fuentes del rice.
 - `~/.config/demonshot/` y `~/.local/state/rice/` — estado del rice y del selector de fondos.
-- `gsettings` de GNOME: `color-scheme=prefer-dark` y `gtk-theme=adw-gtk3-dark` (`uninstall.sh` no los revierte).
+- `~/.local/share/icons/Rice/` — tema de iconos que crea `rice` al cambiar de shell o de color de carpetas.
+- `gsettings` de GNOME: `color-scheme=prefer-dark`, `gtk-theme=adw-gtk3-dark` e `icon-theme=Rice` (`uninstall.sh` no los revierte).
 - `~/Pictures/Wallpapers/` — carpeta del selector de fondos (no la vacía).
+- `~/Pictures/Gifs/` — GIF del widget del gato (no la vacía).
 - `/etc/sddm.conf.d/zz-glyph.conf` y `/usr/share/sddm/themes/glyph` — tema de login.
 - `/etc/udev/rules.d/70-glyph-uinput.rules` — regla de `ydotool`.
 - **No toca** `/etc/default/grub`, `grub.cfg`, `HOOKS` ni el initramfs: Glyph no instala Plymouth ni cambia el arranque.
