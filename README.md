@@ -54,13 +54,13 @@ Also: Hyprland (Lua), hypridle, kitty, fish, starship, fastfetch, btop, cava (do
 <h2 align="center">Install</h2>
 
 ```sh
-git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/glyph
-~/.local/share/glyph/install.sh                  # Arch: packages, services, symlinks, keyboard, login theme
-~/.local/share/glyph/install.sh --check          # detect keyboard/monitors and print versions; change nothing
-~/.local/share/glyph/install.sh --with telegram  # same, extras picked up front
-~/.local/share/glyph/install.sh --links          # any distro: symlinks + keyboard override, no packages
-~/.local/share/glyph/install.sh --sddm           # login theme only (sudo); run again after editing it
-~/.local/share/glyph/uninstall.sh                # remove the symlinks, restore the newest backup
+git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/raidenmgr47
+~/.local/share/raidenmgr47/install.sh                  # Arch: packages, services, symlinks, keyboard, login theme
+~/.local/share/raidenmgr47/install.sh --check          # detect keyboard/monitors and print versions; change nothing
+~/.local/share/raidenmgr47/install.sh --with telegram  # same, extras picked up front
+~/.local/share/raidenmgr47/install.sh --links          # any distro: symlinks + keyboard override, no packages
+~/.local/share/raidenmgr47/install.sh --sddm           # login theme only (sudo); run again after editing it
+~/.local/share/raidenmgr47/uninstall.sh                # remove the symlinks, restore the newest backup
 ```
 
 > If you downloaded a ZIP instead of cloning, run `chmod +x install.sh uninstall.sh` once before running them.
@@ -130,8 +130,8 @@ Respecto al rice original de [`Nebelung-cloud/glyph-rice`](https://github.com/Ne
 Flujo recomendado para esta copia:
 
 ```sh
-git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/glyph
-cd ~/.local/share/glyph
+git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/raidenmgr47
+cd ~/.local/share/raidenmgr47
 ./install.sh --check                                   # detecta y muestra, sin cambiar nada
 ./install.sh --keyboard latam --monitor DVI-I-1:1366x768@60
 sudo reboot
@@ -140,7 +140,7 @@ sudo reboot
 Para deshacer:
 
 ```sh
-cd ~/.local/share/glyph
+cd ~/.local/share/raidenmgr47
 ./uninstall.sh --dry-run
 ./uninstall.sh
 ```

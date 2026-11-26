@@ -20,7 +20,7 @@ Esta guía organiza y explica paso a paso el proceso de instalación de Arch Lin
 >
 > **🔄 Actualización (22 de noviembre de 2026)**: añadido el script `hora-teclado-chroot.sh`, que automatiza dentro del chroot la sincronización de hora (NTP) y el teclado de consola y X11, para que SDDM/LightDM/GDM reconozcan el teclado desde el primer arranque. La sección de idioma y teclado se separó en **idioma**, **zona horaria** y **teclado y hora** (el idioma y la zona horaria siguen siendo manuales), y la sección posterior al arranque pasó a ser solo de comprobación.
 >
-> **🔄 Actualización (25 de noviembre de 2026)**: añadida la **Opción D: Hyprland + Glyph (estilo Nothing OS)**. Sustituye a la versión anterior, que montaba dos dotfiles (KooL + `nothing-os-dots-hyprland`): ahora usa un único rice, **Glyph** (en este repositorio, con el instalador adaptado). El instalador **detecta solo el teclado** (y lo escribe en `user.lua`; se puede forzar con `--keyboard latam`), **detecta el monitor** (y permite fijarlo con `--monitor`), trae atajos adaptados para `latam` y un `uninstall.sh`. Reutiliza la **Base común**, los **Controladores de GPU**, `noto-fonts` y el teclado/hora del chroot, y no toca Plymouth, GRUB, `HOOKS` ni el initramfs.
+> **🔄 Actualización (25 de noviembre de 2026)**: añadida la **Opción D: Hyprland + Glyph (estilo Nothing OS)**, un único rice en este repositorio con un instalador adaptado para Arch. El instalador **detecta solo el teclado** (y lo escribe en `user.lua`; se puede forzar con `--keyboard latam`), **detecta el monitor** (y permite fijarlo con `--monitor`), trae atajos adaptados para `latam` y un `uninstall.sh`. Reutiliza la **Base común**, los **Controladores de GPU**, `noto-fonts` y el teclado/hora del chroot, y no toca Plymouth, GRUB, `HOOKS` ni el initramfs.
 
 ---
 
@@ -750,13 +750,13 @@ sudo systemctl start lightdm.service   # o reinicia con `reboot`
 
 ### Opción D: **Hyprland + Glyph (estilo Nothing OS)** (**SDDM**)
 
-Un escritorio con el aspecto de Nothing OS sobre Hyprland: barra flotante, launcher, panel de control, deck, widgets y una pantalla de login a juego, todo hecho con **Quickshell**. A diferencia de la versión anterior de esta guía, **no se montan dos dotfiles encima**: [**Glyph**](https://github.com/Nebelung-cloud/glyph-rice) es un rice único y autocontenido que trae sus propias configuraciones de Hyprland, Quickshell, kitty, fish, fastfetch, btop, cava, fuentes y el tema de SDDM. Así se evitan los problemas de compatibilidad de mantener KooL (`Arch-Hyprland` + `Hyprland-Dots`) y `nothing-os-dots-hyprland` a la vez.
+Un escritorio con el aspecto de Nothing OS sobre Hyprland: barra flotante, launcher, panel de control, deck, widgets y una pantalla de login a juego, todo hecho con **Quickshell**. [**Glyph**](https://github.com/Nebelung-cloud/glyph-rice) es un rice único y autocontenido que trae sus propias configuraciones de Hyprland, Quickshell, kitty, fish, fastfetch, btop, cava, fuentes y el tema de SDDM. En este repositorio se usa la copia adaptada con el instalador para Arch.
 
 - Repo: `https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git` (tu copia adaptada; upstream: `https://github.com/Nebelung-cloud/glyph-rice`)
 - Requisitos: Arch con la **Base común** y los **Controladores de GPU** de esta guía, Internet y **Hyprland 0.56+**; el instalador pone el resto (`quickshell` 0.3.1+, SDDM 0.21+, kitty, fish…).
 - Lo que esta guía ya hizo y no se repite: teclado de consola/X11 y hora del chroot, `pacman -Syu`, usuario con `sudo`, `nano`, NetworkManager, PipeWire/WirePlumber, `noto-fonts`, Firefox y los drivers de GPU.
 
-> **⚠️ Sustituye por completo a la antigua Opción D (KooL + Nothing).** No instales los dos: Glyph enlaza `~/.config/hypr`, `~/.config/quickshell`, `~/.config/kitty`, `~/.config/fish`, etc. Si ya tenías la Opción D antigua, mira **D2** para retirar sus restos antes de continuar.
+> **📌 El instalador se encarga de los archivos existentes:** mueve cualquier configuración previa en `~/.config` a `~/.dots-backup-<fecha>/` antes de crear sus enlaces. No hace falta limpiar nada a mano; basta con ejecutar el instalador como tu usuario.
 
 #### D1. Dependencias base: `git` y `base-devel`
 
@@ -776,39 +776,30 @@ makepkg -si
 cd ~ && rm -rf ~/yay-bin
 ```
 
-#### D2. Preparar el sistema y retirar la Opción D antigua
+#### D2. Preparar el sistema
 
 Antes de ejecutar el instalador:
 
-1. **Un solo gestor de login.** Si tienes `gdm` o `lightdm` habilitados, desactívalos; Glyph usa **SDDM**:
+1. **Un solo gestor de login.** Glyph usa **SDDM**. Si habías instalado otro gestor, desactívalo:
    ```bash
    sudo systemctl disable gdm lightdm 2>/dev/null || true
    ```
-2. **Si vienes de KooL + Nothing**, quita el tema y la configuración de SDDM antiguos (si no, `zz-nothing.conf` se lee después de `zz-glyph.conf` y gana):
-   ```bash
-   sudo rm -f /etc/sddm.conf.d/zz-nothing.conf
-   sudo rm -rf /usr/share/sddm/themes/nothing
-   ```
-   El resto de configuraciones de KooL/Nothing en `~/.config` no hace falta borrarlas: el instalador las mueve a `~/.dots-backup-<fecha>/` antes de crear sus enlaces.
-3. **Quickshell:** Glyph usa el paquete `quickshell` de los repos, no `quickshell-git`. Si lo instalaste con la Opción D antigua, retíralo:
-   ```bash
-   sudo pacman -Rns quickshell-git 2>/dev/null || true
-   ```
-4. **Shell:** Glyph usa **fish** en kitty (`shell fish` en `kitty.conf`), así que no necesitas cambiar tu shell de login. Si quieres fish también fuera de kitty: `chsh -s /usr/bin/fish`.
+   El instalador habilita `sddm.service` y, si hace falta, te pregunta antes de desactivar otros gestores.
+2. **Shell:** Glyph usa **fish** en kitty (`shell fish` en `kitty.conf`), así que no necesitas cambiar tu shell de login. Si quieres fish también fuera de kitty: `chsh -s /usr/bin/fish`.
 
 #### D3. Clonar e instalar Glyph
 
 Clónalo en la ruta que usa el README y ejecútalo **como tu usuario, nunca con `sudo`** (el script llama a `sudo` solo donde hace falta):
 
 ```bash
-git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/glyph
-cd ~/.local/share/glyph
+git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/raidenmgr47
+cd ~/.local/share/raidenmgr47
 chmod +x install.sh uninstall.sh
 ./install.sh --check    # opcional: detecta teclado/monitores y muestra versiones; no cambia nada
 ./install.sh
 ```
 
-> **📌 Si ya tienes la carpeta `raidenmgr47-rice-main` descargada** (por ejemplo, la que viene con este repo), puedes copiarla como `~/.local/share/glyph` y ejecutar su `install.sh`; el resultado es el mismo. `git clone` solo añade la posibilidad de actualizar luego con `git pull`.
+> **📌 Si ya tienes la carpeta `raidenmgr47-rice-main` descargada** (por ejemplo, la que viene con este repo), puedes copiarla como `~/.local/share/raidenmgr47` y ejecutar su `install.sh`; el resultado es el mismo. `git clone` solo añade la posibilidad de actualizar luego con `git pull`.
 
 Sin argumentos te pregunta qué extras quieres: `telegram` (`Super+D`), `spotify` con Spicetify (`Super+M`) y `clash` para el panel VPN (`Super+P`). También puedes elegirlos de antemano:
 
@@ -825,7 +816,7 @@ Qué hace, en orden:
 1. `sudo pacman -Syu --needed` con su lista de paquetes: Hyprland, `quickshell`, SDDM, PipeWire, NetworkManager, bluez, kitty, fish, fuentes, `grim`/`slurp`, `cliphist`, etc. Es una actualización completa, no parcial.
 2. Instala `yay` si falta y los paquetes del AUR: `qtengine`, `darkly-bin`, `bibata-cursor-theme-bin` y `zen-browser-bin` (el navegador por defecto del rice), más los extras si los pediste. **El AUR es opcional**: si un paquete falla, el script sigue con los servicios y los enlaces.
 3. Habilita `NetworkManager`, `bluetooth`, `power-profiles-daemon`, `pipewire-pulse.socket`, `wireplumber` y `ydotool`; añade tu usuario al grupo `video` y crea la regla udev de `/dev/uinput` para `ydotool`.
-4. Mueve las configuraciones que ya existieran a `~/.dots-backup-<fecha>/` y crea enlaces simbólicos desde `~/.local/share/glyph/config/...` a `~/.config/...` (Hyprland, Quickshell, kitty, fish, starship, fastfetch, btop, cava, GTK/Qt y fuentes).
+4. Mueve las configuraciones que ya existieran a `~/.dots-backup-<fecha>/` y crea enlaces simbólicos desde `~/.local/share/raidenmgr47/config/...` a `~/.config/...` (Hyprland, Quickshell, kitty, fish, starship, fastfetch, btop, cava, GTK/Qt y fuentes).
 5. **Detecta el teclado** (un `user.lua` previo, Hyprland en marcha, `localectl`, `/etc/vconsole.conf`, `00-keyboard.conf`, `setxkbmap`, `/etc/default/keyboard` o el locale, por ese orden) y escribe el bloque gestionado en `~/.config/hypr/user.lua`; si no existe, lo crea desde `user.lua.example`. Salvo `--no-system-keyboard`, sincroniza también la consola y X11 con `localectl`.
 6. **Detecta los monitores** en `/sys/class/drm`, imprime cada salida conectada con su modo preferido y avisa si una salida conectada no reporta modos (EDID/DDC). Con `--monitor OUTPUT:MODO[:POSICIÓN[:ESCALA]]` escribe reglas `hl.monitor()` en `user.lua` (se puede repetir para varias pantallas).
 7. Copia el tema de login a `/usr/share/sddm/themes/glyph`, lo fija en `/etc/sddm.conf.d/zz-glyph.conf` y habilita `sddm` si no hay otro gestor de login activo.
@@ -842,7 +833,7 @@ sudo reboot
 
 #### D4. Primer arranque y teclado latinoamericano
 
-En SDDM elige la sesión **Hyprland** y entra. La terminal del rice es **kitty** con `Super+Q` (no `Super+Enter`, que era de KooL). El instalador ya detectó el teclado y escribió el resultado en `~/.config/hypr/user.lua`; comprueba que Hyprland lo aplica:
+En SDDM elige la sesión **Hyprland** y entra. La terminal del rice es **kitty** con `Super+Q`. El instalador ya detectó el teclado y escribió el resultado en `~/.config/hypr/user.lua`; comprueba que Hyprland lo aplica:
 
 ```bash
 hyprctl version | head -1                 # necesitas 0.56 o superior
@@ -852,7 +843,7 @@ hyprctl devices | grep -A2 -i keyboard    # "layout" debe decir latam
 Si no es tu layout, no edites los archivos del repo: vuelve a lanzar el instalador con el layout forzado.
 
 ```bash
-cd ~/.local/share/glyph
+cd ~/.local/share/raidenmgr47
 ./install.sh --keyboard latam              # o "latam,us" para alternar con Alt+Shift
 # si no quieres tocar paquetes ni servicios:
 ./install.sh --links --keyboard latam
@@ -975,25 +966,25 @@ Atajos de referencia del rice:
 - **Diagnóstico sin cambios:** `./install.sh --check` imprime el teclado detectado y su origen, las salidas de vídeo y las versiones instaladas. No instala ni escribe nada.
 - **`quickshell` se cae o da errores QML:** comprueba `pacman -Q quickshell` (debe ser 0.3.1 o superior) y que no tengas `quickshell-git` instalado a la vez. Actualiza con `sudo pacman -Syu`.
 - **Un paquete del AUR falla:** instálalo a mano con `yay -S --needed qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin` y vuelve a ejecutar `./install.sh --links` (solo enlaces, sin paquetes).
-- **El tema de login sigue siendo el antiguo:** revisa que no quede `zz-nothing.conf` ni otro `Current=` en `/etc/sddm.conf`; el archivo `zz-glyph.conf` debe ser el último en leerse. Borra el tema viejo si sigue ahí.
+- **El tema de login no es Glyph:** revisa que no haya otro `Current=` en `/etc/sddm.conf` compitiendo con `/etc/sddm.conf.d/zz-glyph.conf` (debe decir `Current=glyph`). El instalador avisa si encuentra ese conflicto.
 - **El teclado sigue en US dentro de Hyprland:** confirma que `~/.config/hypr/user.lua` existe, que `hyprctl reload` no da errores y que `hyprctl devices` muestra `latam`. Vuelve a ejecutar `./install.sh --keyboard latam` (o `./install.sh --links --keyboard latam`, que no toca paquetes). Como último recurso, edita el bloque `-- >>> glyph:keyboard` de `user.lua`, o `~/.config/hypr/hyprland/input.lua` cambiando `kb_layout = "us,ru"` por `kb_layout = "latam"` (pero entonces un `git pull` puede pedirte resolver el conflicto).
 - **El login sale en inglés:** `localectl status`, `/etc/vconsole.conf` con `KEYMAP=la-latin1` y `00-keyboard.conf` con `XkbLayout "latam"`. Si tu SDDM usa Wayland, el teclado del greeter se configura en el compositor; Glyph no lo activa por defecto.
 - **Resolución rara en el BenQ:** comprueba `./install.sh --check`; si el conector no reporta modos, fíjalo con `./install.sh --monitor DVI-I-1:1366x768@60` como en D6; el resto de la nota del monitor sigue aplicando (EDID, `amdgpu`, GRUB).
-- **Actualizas el repo:** `cd ~/.local/share/glyph && git pull`. Los archivos de `config/` son enlaces simbólicos, así que los cambios se aplican solos; tus overrides en `user.lua` no se tocan (solo se reescriben los bloques `-- >>> glyph:...`). Si el upstream añadió archivos, vuelve a ejecutar `./install.sh --links`. Después, `hyprctl reload`.
+- **Actualizas el repo:** `cd ~/.local/share/raidenmgr47 && git pull`. Los archivos de `config/` son enlaces simbólicos, así que los cambios se aplican solos; tus overrides en `user.lua` no se tocan (solo se reescriben los bloques `-- >>> glyph:...`). Si el upstream añadió archivos, vuelve a ejecutar `./install.sh --links`. Después, `hyprctl reload`.
 
 #### D8. Cómo deshacer Glyph
 
 Glyph incluye `uninstall.sh`, que revierte la instalación de forma segura. Ejecútalo **como tu usuario, nunca con `sudo`**:
 
 ```bash
-cd ~/.local/share/glyph
+cd ~/.local/share/raidenmgr47
 ./uninstall.sh --dry-run    # previsualiza los cambios sin tocar nada
 ./uninstall.sh              # quita los enlaces y restaura la copia más reciente
 ```
 
 Qué hace, en orden:
 
-1. Quita solo los enlaces simbólicos que apuntan dentro de `~/.local/share/glyph`; deja cualquier archivo que no sea suyo.
+1. Quita solo los enlaces simbólicos que apuntan dentro de `~/.local/share/raidenmgr47`; deja cualquier archivo que no sea suyo.
 2. Restaura las configuraciones antiguas desde el `~/.dots-backup-<fecha>/` más reciente (Hyprland, Quickshell, kitty, fish, fuentes, etc.).
 3. Restaura `/etc/vconsole.conf` y `/etc/X11/xorg.conf.d/00-keyboard.conf` desde sus copias `.glyph-backup-*`.
 4. Borra `/usr/share/sddm/themes/glyph`, `/etc/sddm.conf.d/zz-glyph.conf` y la regla udev `70-glyph-uinput.rules` de `ydotool`.
@@ -1004,7 +995,7 @@ Opciones: `--no-restore` (no restaurar configuraciones), `--keep-sddm` (dejar te
 **No deshabilita SDDM, no desinstala Hyprland/Quickshell/SDDM y no borra el repo.** Si además quieres borrar el repo y las fuentes, hazlo a mano al terminar:
 
 ```bash
-rm -rf ~/.local/share/glyph ~/.local/share/fonts/glyph
+rm -rf ~/.local/share/raidenmgr47 ~/.local/share/fonts/glyph
 # Solo paquetes que ya no uses (NO borres sddm si lo usas para otro escritorio):
 sudo pacman -Rns qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin
 ```
@@ -1013,7 +1004,7 @@ sudo pacman -Rns qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin
 
 - `~/.config/` — Hyprland, Quickshell, kitty, fish, starship, fastfetch, btop, cava, GTK/Qt (copias previas en `~/.dots-backup-<fecha>/`).
 - `~/.local/bin/rice` — lanzador del shell.
-- `~/.local/share/glyph/` — el repo clonado.
+- `~/.local/share/raidenmgr47/` — el repo clonado.
 - `~/.local/share/fonts/glyph/` — fuentes del rice.
 - `~/Pictures/Wallpapers/` — carpeta del selector de fondos (no la vacía).
 - `/etc/sddm.conf.d/zz-glyph.conf` y `/usr/share/sddm/themes/glyph` — tema de login.
