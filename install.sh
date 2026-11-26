@@ -201,15 +201,28 @@ packages() {
         pac_args=(--noconfirm)
     fi
 
-    # PulseAudio modules make pacman refuse to replace pulseaudio with pipewire-pulse.
+    # PulseAudio conflicts with pipewire-pulse. With --noconfirm pacman answers "no" to
+    # "Remove pulseaudio? [y/N]" and aborts the transaction, so remove it beforehand in --yes mode.
     pa=$(pacman -Qq pulseaudio-{bluetooth,jack,lirc,rtp,zeroconf,equalizer,equalizer-ladspa} 2>/dev/null || true)
-    if [ -n "$pa" ]; then
-        warn "removing PulseAudio modules that conflict with PipeWire: $pa"
-        # shellcheck disable=SC2086
-        sudo pacman -R --noconfirm $pa || warn "could not remove: $pa"
-    fi
     if pacman -Q pulseaudio >/dev/null 2>&1; then
-        warn "pacman will ask to replace pulseaudio with pipewire-pulse: answer yes"
+        if [ "$YES" = 1 ]; then
+            pa="${pa:+$pa }pulseaudio"
+        else
+            warn "pacman will ask to replace pulseaudio with pipewire-pulse: answer yes"
+        fi
+    fi
+    if [ -n "$pa" ]; then
+        warn "removing PulseAudio packages that conflict with PipeWire: $pa"
+        # shellcheck disable=SC2086
+        if ! sudo pacman -R --noconfirm $pa; then
+            if [ "$YES" = 1 ] && pacman -Q pulseaudio >/dev/null 2>&1; then
+                warn "plain removal failed; forcing removal of the conflicting PulseAudio packages"
+                # shellcheck disable=SC2086
+                sudo pacman -Rdd --noconfirm $pa || die "cannot remove PulseAudio; install pipewire-pulse manually"
+            else
+                warn "could not remove: $pa"
+            fi
+        fi
     fi
 
     # Upgrade the database first: with stale mirrors a package added upstream would be reported

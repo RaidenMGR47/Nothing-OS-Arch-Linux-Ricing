@@ -131,9 +131,18 @@ replace_block() { # file start end content (content is written verbatim)
     rm -f -- "$tmp" "$block"
 }
 
-backup_file() { # path [use_sudo:0|1]
-    local path=$1 use_sudo=${2:-0} dest
+backup_file() { # path [use_sudo:0|1] [keep_first:0|1]
+    local path=$1 use_sudo=${2:-0} keep_first=${3:-0} dest b
     [ -e "$path" ] || [ -L "$path" ] || return 0
+    # keep_first=1: never replace the pre-Glyph copy with a later, already-modified one.
+    if [ "$keep_first" = 1 ]; then
+        for b in "$path".glyph-backup-*; do
+            if [ -e "$b" ] || [ -L "$b" ]; then
+                info "original backup already kept: $b"
+                return 0
+            fi
+        done
+    fi
     dest="${path}.glyph-backup-${GLYPH_STAMP:-$(date +%F_%H-%M-%S)}"
     if [ -e "$dest" ] || [ -L "$dest" ]; then
         info "backup already exists: $dest"

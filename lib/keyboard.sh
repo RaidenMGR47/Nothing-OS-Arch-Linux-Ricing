@@ -470,8 +470,10 @@ kb_apply_system() { # no_system_keyboard
         return 0
     fi
 
-    backup_file /etc/vconsole.conf 1
-    backup_file /etc/X11/xorg.conf.d/00-keyboard.conf 1
+    # Keep the first copy: a second install must not replace our restore point with a
+    # file that Glyph itself already modified, or uninstall would not restore the original.
+    backup_file /etc/vconsole.conf 1 1
+    backup_file /etc/X11/xorg.conf.d/00-keyboard.conf 1 1
 
     if have localectl && [ -d /run/systemd/system ]; then
         if sudo localectl set-keymap --no-convert "$KB_VCONSOLE"; then
