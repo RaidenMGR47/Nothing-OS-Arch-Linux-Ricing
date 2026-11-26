@@ -1,13 +1,18 @@
 # Contributing
 
-Work happens on `dev`; `main` only moves with releases. Branch from `dev` and open the pull request into `dev`:
+Work happens on `main`. Branch from it and open the pull request back into `main`:
 
 ```sh
-git remote add upstream https://github.com/Nebelung-cloud/glyph-rice
-git fetch upstream
-git switch -c my-fix upstream/dev
+git switch -c my-fix
+# make your changes
+git add . && git commit -m "describe the change"
+git push -u origin my-fix
 ```
 
-Already branched from `main`? `git fetch upstream && git rebase --onto upstream/dev upstream/main`, then push again.
+`origin` should point at this repository:
+
+```sh
+git remote set-url origin https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git
+```
 
 One change per pull request, and say how you tested it on a live session.

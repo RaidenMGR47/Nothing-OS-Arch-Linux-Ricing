@@ -54,7 +54,7 @@ Also: Hyprland (Lua), hypridle, kitty, fish, starship, fastfetch, btop, cava (do
 <h2 align="center">Install</h2>
 
 ```sh
-git clone https://github.com/Nebelung-cloud/glyph-rice ~/.local/share/glyph
+git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/glyph
 ~/.local/share/glyph/install.sh                  # Arch: packages, services, symlinks, keyboard, login theme
 ~/.local/share/glyph/install.sh --check          # detect keyboard/monitors and print versions; change nothing
 ~/.local/share/glyph/install.sh --with telegram  # same, extras picked up front
@@ -64,6 +64,8 @@ git clone https://github.com/Nebelung-cloud/glyph-rice ~/.local/share/glyph
 ```
 
 > If you downloaded a ZIP instead of cloning, run `chmod +x install.sh uninstall.sh` once before running them.
+
+> 📖 **Guía completa en español:** [Arch Linux Installation.md](<Arch Linux Installation.md>) — instalación desde cero (BIOS/UEFI), chroot, GRUB, controladores de GPU, teclado y la nota del monitor BenQ.
 
 Without `--with` it asks which extras to add: `telegram` (`Super` `D`), `spotify` with Spicetify (`Super` `M`),
 `clash` for the VPN panel. Old configs go to `~/.dots-backup-<date>/`. Wallpapers are read from `~/Pictures/Wallpapers`,
@@ -114,6 +116,33 @@ apps.todo   = "planify"             -- Super R, empty by default
 apps.music  = "spicetify watch -s"  -- Super M, spotify-launcher by default
 
 hl.bind("SUPER + G", hl.dsp.global("shell:game"))  -- game mode has no key by default
+```
+
+<h2 align="center">Cambios en esta copia / What's different here</h2>
+
+Respecto al rice original de [`Nebelung-cloud/glyph-rice`](https://github.com/Nebelung-cloud/glyph-rice), esta versión añade:
+
+- **`install.sh` modular** (`lib/common.sh`, `lib/manifest.sh`, `lib/keyboard.sh`, `lib/monitor.sh`): detecta el teclado automáticamente y lo escribe en `hypr/user.lua`, mantiene consola/X11 sincronizados y detecta los monitores desde `/sys/class/drm`. Opciones nuevas: `--check`, `--keyboard`, `--kb-options`, `--no-system-keyboard`, `--monitor`, `--keep-dm`, `--no-aur` e `--yes`.
+- **`uninstall.sh` nuevo**: quita solo los enlaces que apuntan a este repo, restaura `~/.dots-backup-*`, vuelve a poner `/etc/vconsole.conf` y `00-keyboard.conf` desde sus copias `.glyph-backup-*`, y elimina el tema de SDDM y la regla udev de `ydotool`. No desinstala paquetes salvo `--packages`.
+- **`config/hypr/user.lua.example`**: atajos alternativos (`Super+Alt+C`, `Super+Alt+X`, `Super+Alt+P`) para teclados donde la barra invertida requiere `AltGr`. `user.lua` ya no se distribuye: se genera solo, con bloques gestionados `-- >>> glyph:...` que el instalador puede reescribir sin borrar lo tuyo.
+- **Guía adaptada**: [Arch Linux Installation.md](<Arch Linux Installation.md>) documenta la Opción D con Glyph, `latam`, el monitor BenQ y el desinstalador.
+
+Flujo recomendado para esta copia:
+
+```sh
+git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.local/share/glyph
+cd ~/.local/share/glyph
+./install.sh --check                                   # detecta y muestra, sin cambiar nada
+./install.sh --keyboard latam --monitor DVI-I-1:1366x768@60
+sudo reboot
+```
+
+Para deshacer:
+
+```sh
+cd ~/.local/share/glyph
+./uninstall.sh --dry-run
+./uninstall.sh
 ```
 
 <div align="center"><img src="assets/divider-glyph.svg" width="720" alt=""></div>
