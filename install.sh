@@ -58,10 +58,10 @@ Usage: ./install.sh [options]
   --keep-dm              do not enable/disable display managers
   --no-aur               skip yay and the AUR packages
   --check                detect keyboard/monitors and print versions, change nothing
-  -y, --yes              non-interactive; accept the defaults
+  -y, --yes              non-interactive; no extras unless --with, yes to prompts
   -h, --help             this help
 
-Without --with the installer asks which extras to add. Old configs go to
+Without --with the installer asks which extras to add (not with --yes). Old configs go to
 ~/.dots-backup-<date>/. Run as your user, never with sudo.
 EOF
 }
@@ -109,6 +109,12 @@ while [ $# -gt 0 ]; do
         *) die "unknown option: $1 (see --help)" ;;
     esac
 done
+
+# --yes is non-interactive: do not ask for extras unless --with was given.
+if [ "$YES" = 1 ] && [ "$WITH_SET" = 0 ]; then
+    WITH_SET=1
+    WITH=
+fi
 
 # confirm() in lib/common.sh reads YES from the environment of the sourced functions.
 export YES

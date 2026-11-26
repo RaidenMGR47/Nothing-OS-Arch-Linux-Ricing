@@ -806,14 +806,17 @@ Sin argumentos te pregunta qué extras quieres: `telegram` (`Super+D`), `spotify
 ```bash
 ./install.sh --with telegram,spotify
 ./install.sh --with ""          # solo el rice, sin extras
+./install.sh --yes --with ""    # desatendido: sin extras y sin preguntas
 ./install.sh --keyboard latam   # forzar el layout (o "latam,us")
 ./install.sh --monitor DVI-I-1:1366x768@60   # forzar el modo del BenQ
 ./install.sh --links            # solo enlaces + user.lua, sin paquetes
 ```
 
+Con `--yes` no se pregunta nada: si no pasas `--with`, no instala extras.
+
 Qué hace, en orden:
 
-1. `sudo pacman -Syu --needed` con su lista de paquetes: Hyprland, `quickshell`, SDDM, PipeWire, NetworkManager, bluez, kitty, fish, fuentes, `grim`/`slurp`, `cliphist`, etc. Es una actualización completa, no parcial.
+1. `sudo pacman -Syu` y después `sudo pacman -S --needed` con su lista de paquetes: Hyprland, `quickshell`, SDDM, PipeWire, NetworkManager, bluez, kitty, fish, fuentes, `grim`/`slurp`, `cliphist`, etc. Es una actualización completa, no parcial.
 2. Instala `yay` si falta y los paquetes del AUR: `qtengine`, `darkly-bin`, `bibata-cursor-theme-bin` y `zen-browser-bin` (el navegador por defecto del rice), más los extras si los pediste. **El AUR es opcional**: si un paquete falla, el script sigue con los servicios y los enlaces.
 3. Habilita `NetworkManager`, `bluetooth`, `power-profiles-daemon`, `pipewire-pulse.socket`, `wireplumber` y `ydotool`; añade tu usuario al grupo `video` y crea la regla udev de `/dev/uinput` para `ydotool`.
 4. Mueve las configuraciones que ya existieran a `~/.dots-backup-<fecha>/` y crea enlaces simbólicos desde `~/.local/share/raidenmgr47/config/...` a `~/.config/...` (Hyprland, Quickshell, kitty, fish, starship, fastfetch, btop, cava, GTK/Qt y fuentes).
@@ -993,7 +996,7 @@ Qué hace, en orden:
 4. Borra `/usr/share/sddm/themes/glyph`, `/etc/sddm.conf.d/zz-glyph.conf` y la regla udev `70-glyph-uinput.rules` de `ydotool`.
 5. Borra el marcador `~/.local/state/rice/shell`.
 
-Opciones: `--no-restore` (no restaurar configuraciones), `--keep-sddm` (dejar tema y configuración de SDDM), `--packages` (ofrecer quitar solo los paquetes AUR opcionales — `zen-browser-bin` es tu navegador) y `--yes` (no preguntar).
+Opciones: `--no-restore` (no restaurar configuraciones), `--keep-sddm` (dejar tema y configuración de SDDM), `--packages` (ofrecer quitar solo los paquetes AUR opcionales — `zen-browser-bin` es tu navegador; con `--yes` los quita sin preguntar) y `--yes` (no preguntar).
 
 **No deshabilita SDDM, no desinstala Hyprland/Quickshell/SDDM y no borra el repo.** Si además quieres borrar el repo y las fuentes, hazlo a mano al terminar:
 
@@ -1010,7 +1013,7 @@ sudo pacman -Rns qtengine darkly-bin bibata-cursor-theme-bin zen-browser-bin
 - `~/.local/share/raidenmgr47/` — el repo clonado.
 - `~/.local/share/fonts/glyph/` — fuentes del rice.
 - `~/.config/demonshot/` y `~/.local/state/rice/` — estado del rice y del selector de fondos.
-- `~/.local/share/icons/Rice/` — tema de iconos que crea `rice` al cambiar de shell o de color de carpetas.
+- `~/.local/share/icons/Rice/` — tema de iconos que crea `rice` al cambiar de shell o de color de carpetas (`uninstall.sh` no lo borra).
 - `gsettings` de GNOME: `color-scheme=prefer-dark`, `gtk-theme=adw-gtk3-dark` e `icon-theme=Rice` (`uninstall.sh` no los revierte).
 - `~/Pictures/Wallpapers/` — carpeta del selector de fondos (no la vacía).
 - `~/Pictures/Gifs/` — GIF del widget del gato (no la vacía).

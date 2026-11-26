@@ -33,8 +33,9 @@ Usage: ./uninstall.sh [options]
   --dry-run         print every change, touch nothing
   --no-restore      remove Glyph but do not restore ~/.dots-backup-*
   --keep-sddm       leave /usr/share/sddm/themes/glyph and zz-glyph.conf alone
-  --packages        also offer to remove the Glyph-specific AUR packages
-  -y, --yes         non-interactive; accept the defaults (restore yes, packages no)
+  --packages        also remove the Glyph-specific AUR packages (asks first;
+                    with --yes it removes them, including zen-browser-bin)
+  -y, --yes         non-interactive; answer yes to confirmations
   -h, --help        this help
 
 It removes only symlinks that point into this repo, restores the newest backup (older copies are

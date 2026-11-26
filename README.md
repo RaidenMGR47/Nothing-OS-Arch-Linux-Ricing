@@ -60,6 +60,7 @@ git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.loc
 ~/.local/share/raidenmgr47/install.sh                  # Arch: packages, services, symlinks, keyboard, login theme
 ~/.local/share/raidenmgr47/install.sh --check          # detect keyboard/monitors and print versions; change nothing
 ~/.local/share/raidenmgr47/install.sh --with telegram  # same, extras picked up front
+~/.local/share/raidenmgr47/install.sh --yes --with ""  # unattended, no extras
 ~/.local/share/raidenmgr47/install.sh --links          # any distro: symlinks + keyboard override, no packages
 ~/.local/share/raidenmgr47/install.sh --sddm           # login theme only (sudo); run again after editing it
 ~/.local/share/raidenmgr47/uninstall.sh                # remove the symlinks, restore the newest backup
@@ -70,7 +71,8 @@ git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.loc
 > 📖 **Guía completa en español:** [Arch Linux Installation.md](<Arch Linux Installation.md>) — instalación desde cero (BIOS/UEFI), chroot, GRUB, controladores de GPU, teclado y la nota del monitor BenQ.
 
 Without `--with` it asks which extras to add: `telegram` (`Super` `D`), `spotify` with Spicetify (`Super` `M`),
-`clash` for the VPN panel. AUR packages are installed interactively (unless `--yes`) so you can review the PKGBUILDs;
+`clash` for the VPN panel. With `--yes` and no `--with` it asks nothing and selects no extras.
+AUR packages are installed interactively (unless `--yes`) so you can review the PKGBUILDs;
 if you pick `spotify`, launch it and log in once, then run `spicetify config custom_apps marketplace && spicetify backup apply`.
 Old configs go to `~/.dots-backup-<date>/`. Wallpapers are read from `~/Pictures/Wallpapers`,
 gifs for the home cat tile from `~/Pictures/Gifs` (pick one in prefs → home, or click the tile; none there — the cat).
@@ -106,7 +108,8 @@ keeps your previous file from the backup, rewriting only the managed `-- >>> gly
 
 `uninstall.sh` reverses a full or `--links` install: it removes only symlinks that point into this repo,
 restores the newest `~/.dots-backup-*`, and deletes the SDDM theme and the ydotool udev rule. Packages
-and the repo stay; `--packages` offers to remove the optional AUR ones and `--dry-run` previews everything.
+and the repo stay; `--packages` offers to remove the optional AUR ones (with `--yes` it removes them
+without asking) and `--dry-run` previews everything.
 
 Backlight, GPU and sensors are detected. Default apps are in `hypr/variables.lua`. For an optional Buds image, add `<device-name>.png` to `quickshell/glyph/buds/`:
 lowercase, with punctuation and spaces replaced by a single hyphen (e.g. `Nothing Ear (3)` → `nothing-ear-3.png`).
