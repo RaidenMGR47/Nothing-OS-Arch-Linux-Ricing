@@ -38,8 +38,9 @@ Usage: ./uninstall.sh [options]
   -y, --yes         non-interactive; answer yes to confirmations
   -h, --help        this help
 
-It removes only symlinks that point into this repo, restores the newest backup (older copies are
-left untouched), and deletes the SDDM theme, zz-glyph.conf and the ydotool udev rule. SDDM itself,
+It removes only symlinks that point into this repo, restores the newest ~/.dots-backup-* (older copies
+are left untouched) and the oldest system keyboard .glyph-backup-*, and deletes the SDDM theme,
+zz-glyph.conf and the ydotool udev rule. SDDM itself,
 Hyprland, Quickshell and the repo stay installed. Run as your user, never with sudo.
 EOF
 }
@@ -114,8 +115,9 @@ restore_backup() { # backup_dir
 restore_system_backups() {
     local base latest
     for base in /etc/vconsole.conf /etc/X11/xorg.conf.d/00-keyboard.conf; do
+        # The oldest copy is the pre-Glyph original; newer ones were made by later installs.
         latest=$(find "$(dirname -- "$base")" -maxdepth 1 -name "$(basename -- "$base").glyph-backup-*" -type f 2>/dev/null |
-            sort | tail -n 1 || true)
+            sort | head -n 1 || true)
         if [ -z "$latest" ]; then
             info "no system backup for $base; leaving it as is"
             continue
@@ -206,7 +208,7 @@ preflight() {
 main() {
     preflight
 
-    local b
+    local b remaining
     local -a older=()
     BACKUP=$(latest_backup || true)
     if [ -n "$BACKUP" ]; then
@@ -266,7 +268,10 @@ main() {
     printf '\n'
     ok "Glyph removed"
     info "SDDM, Hyprland, Quickshell and this repo were left installed"
-    [ -n "$BACKUP" ] && info "unrestored entries remain in $BACKUP"
+    if [ -n "$BACKUP" ]; then
+        remaining=$(find "$BACKUP" -mindepth 1 \( -type f -o -type l \) -print -quit 2>/dev/null || true)
+        [ -n "$remaining" ] && info "unrestored entries remain in $BACKUP"
+    fi
     [ "$REMOVE_PACKAGES" = 1 ] || info "packages were not removed (use --packages to remove the optional AUR ones)"
 }
 
