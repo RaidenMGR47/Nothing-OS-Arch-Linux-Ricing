@@ -72,6 +72,9 @@ git clone https://github.com/RaidenMGR47/Nothing-OS-Arch-Linux-Ricing.git ~/.loc
 
 Without `--with` it asks which extras to add: `telegram` (`Super` `D`), `spotify` with Spicetify (`Super` `M`),
 `clash` for the VPN panel. With `--yes` and no `--with` it asks nothing and selects no extras.
+With `--yes`, an existing PulseAudio install is removed before installing PipeWire (with `--noconfirm`,
+pacman would decline the conflict). If the normal removal fails it retries with `pacman -Rdd`, which
+skips dependency checks, so any third-party packages that depended on `pulseaudio` may need attention.
 AUR packages are installed interactively (unless `--yes`) so you can review the PKGBUILDs;
 if you pick `spotify`, launch it and log in once, then run `spicetify config custom_apps marketplace && spicetify backup apply`.
 Old configs go to `~/.dots-backup-<date>/`. Wallpapers are read from `~/Pictures/Wallpapers`,
